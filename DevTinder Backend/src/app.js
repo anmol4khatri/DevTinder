@@ -28,6 +28,18 @@ app.get("/feed", async (req,res) => {
     }
 });
 
+//Find user by emailId 
+app.get("/user", async (req,res) => {
+    try{
+        const user = await User.find({ emailId: req.body.emailId})
+        if(user.length == 0) return res.status(404).send("User not found");
+        res.status(200).send(user);
+    }
+    catch(err){
+        res.status(500).send("Oops!! Something Went Wrong");
+    }
+});
+
 connectDB()
     .then(() => {
         console.log("Connection with the database established");
