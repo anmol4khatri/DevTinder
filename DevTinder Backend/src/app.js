@@ -1,14 +1,20 @@
 const express = require("express");
+const connectDB = require("./config/database");
+const User = require("./models/user");
+
 const app = express();
 
-app.use("/test", (req, res) => {
-    res.send("just testing");
-});
+app.use(express.json());
 
-app.use("/hello", (req, res) => {
-    res.send("hello bhai");
-});
 
-app.listen(7777, () => {
-    console.log("Connected to the server at port 7777");
-});
+
+connectDB()
+    .then(() => {
+        console.log("Connection with the database established");
+        app.listen(7777, () => {
+            console.log("Server is listening at port 7777");
+        });
+    })
+    .catch(() => {
+        console.error("Something went wrong while connecting to the database");
+    })
