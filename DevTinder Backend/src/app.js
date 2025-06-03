@@ -9,50 +9,63 @@ app.use(express.json());
 //Signup a new user
 app.post("/signup", async (req, res) => {
     const user = new User(req.body);
-    try{
+    try {
         await user.save();
         res.status(200).send("User data saved successfully");
-    } catch(err){
+    } catch (err) {
         res.status(500).send("Oops!! Something Went Wrong");
     }
 });
 
 //Get all users
-app.get("/feed", async (req,res) => {
-    try{
+app.get("/feed", async (req, res) => {
+    try {
         const users = await User.find({});
         res.status(200).send(users);
     }
-    catch(err){
+    catch (err) {
         res.status(500).send("Oops!! Something Went Wrong");
     }
 });
 
 //Find user by emailId 
-app.get("/user", async (req,res) => {
-    try{
-        const user = await User.find({ emailId: req.body.emailId})
-        if(user.length == 0) return res.status(404).send("User not found");
+app.get("/user", async (req, res) => {
+    try {
+        const user = await User.find({ emailId: req.body.emailId })
+        if (user.length == 0) return res.status(404).send("User not found");
         res.status(200).send(user);
     }
-    catch(err){
+    catch (err) {
         res.status(500).send("Oops!! Something Went Wrong");
     }
 });
 
-//Delete user by _id
-app.delete("/delete", async (req,res) => {
-    try{
-        const deletedUser = await User.findByIdAndDelete(req.body._id);
-        if(!deletedUser) {
-            res.status(404).send("User not found")
-        }
-         res.status(200).send("User Deleted Successfully"); 
+//Delete user by emailId
+app.delete("/user", async (req, res) => {
+    try {
+        const deletedUser = await User.findOneAndDelete({emailId: req.body.emailId});
+        if (!deletedUser) return res.status(404).send("User not found")
+        res.status(200).send("User Deleted Successfully");
     }
-    catch(err){
+    catch (err) {
         res.status(500).send("Oops!! Something Went Wrong");
     }
 });
+
+//Update the user details
+app.patch("/user", async (req, res) => {
+    try {
+        const updatedUser = await User.findOneAndUpdate(
+            { emailId: req.body.emailId },
+            { $set: req.body },
+        );
+        if (!updatedUser) return res.status(404).send("User not found");
+        res.status(200).send("User Updated Successfully");
+    } catch (error) {
+        res.status(500).send("Oops!! Something Went Wrong");
+    }
+});
+
 
 connectDB()
     .then(() => {
