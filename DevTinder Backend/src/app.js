@@ -1,6 +1,7 @@
 const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/user");
+const { validateSignUpData } = require("./utils/validate");
 
 const app = express();
 
@@ -10,10 +11,13 @@ app.use(express.json());
 app.post("/signup", async (req, res) => {
     const user = new User(req.body);
     try {
+        //API Llevel data validation
+        validateSignUpData(req);
+        //Password Encription
         await user.save();
         res.status(200).send("User data saved successfully");
     } catch (err) {
-        res.status(500).send("Oops!! Something Went Wrong");
+        res.status(500).send("Error: " + err.message);
     }
 });
 
@@ -24,7 +28,7 @@ app.get("/feed", async (req, res) => {
         res.status(200).send(users);
     }
     catch (err) {
-        res.status(500).send("Oops!! Something Went Wrong");
+        res.status(500).send("Error: " + err.message);
     }
 });
 
@@ -36,7 +40,7 @@ app.get("/user", async (req, res) => {
         res.status(200).send(user);
     }
     catch (err) {
-        res.status(500).send("Oops!! Something Went Wrong");
+        res.status(500).send("Error: " + err.message);
     }
 });
 
@@ -48,7 +52,7 @@ app.delete("/user", async (req, res) => {
         res.status(200).send("User Deleted Successfully");
     }
     catch (err) {
-        res.status(500).send("Oops!! Something Went Wrong");
+        res.status(500).send("Error: " + err.message);
     }
 });
 
@@ -62,11 +66,11 @@ app.patch("/user", async (req, res) => {
         if (!updatedUser) return res.status(404).send("User not found");
         res.status(200).send("User Updated Successfully");
     } catch (error) {
-        res.status(500).send("Oops!! Something Went Wrong");
+        res.status(500).send("Error: " + err.message);
     }
 });
 
-
+//Start the server and connect to the database
 connectDB()
     .then(() => {
         console.log("Connection with the database established");
