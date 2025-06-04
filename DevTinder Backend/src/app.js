@@ -2,6 +2,7 @@ const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/user");
 const { validateSignUpData } = require("./utils/validate");
+const bcrypt = require("bcrypt");
 
 const app = express();
 
@@ -9,12 +10,22 @@ app.use(express.json());
 
 //Signup a new user
 app.post("/signup", async (req, res) => {
-    const user = new User(req.body);
+    const { firstName, lastName, emailId, password, age, gender, photoUrl, about, skills } = req.body;
     try {
-        //API Llevel data validation
-        validateSignUpData(req);
-        //Password Encription
-        await user.save();
+        validateSignUpData(req); //API Level data validation
+        const passwordHashed = await bcrypt.hash(password, 10); //Password Hashing        
+        const user = new User({ //Creating a new instance of "User" Model
+            firstName,
+            lastName,
+            emailId,
+            password: passwordHashed,
+            age,
+            gender,
+            photoUrl,
+            about,
+            skills
+        });
+        await user.save(); //Saving document into the database
         res.status(200).send("User data saved successfully");
     } catch (err) {
         res.status(500).send("Error: " + err.message);
@@ -47,7 +58,7 @@ app.get("/user", async (req, res) => {
 //Delete user by emailId
 app.delete("/user", async (req, res) => {
     try {
-        const deletedUser = await User.findOneAndDelete({emailId: req.body.emailId});
+        const deletedUser = await User.findOneAndDelete({ emailId: req.body.emailId });
         if (!deletedUser) return res.status(404).send("User not found")
         res.status(200).send("User Deleted Successfully");
     }
