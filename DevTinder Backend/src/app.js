@@ -50,11 +50,10 @@ app.post("/login", async (req, res) => {
         
         const user = await User.findOne({emailId}); //Checking weather the user with this email actually exists
         if(!user) throw new Error("Invalid Credentials");
-        const isPasswordValid = await bcrypt.compare(password, user.password); //Compare user entered password with existing hashed password
+        const isPasswordValid = await user.validatePassword(password); //user schema method function
         if(isPasswordValid) {
             //Creating JWT Token
-            const token = jwt.sign({_id: user._id}, "DevTinder@key", {expiresIn: "7d"});
-            if (!token) throw new Error("Something went wrong while creating JWT token");
+            const token = await user.getJWT(); //user schema method function
             res.cookie("token", token);
 
             res.status(200).send("Login Successful");
