@@ -54,7 +54,7 @@ app.post("/login", async (req, res) => {
         if(isPasswordValid) {
             //Creating JWT Token
             const token = jwt.sign({_id: user._id}, "DevTinder@key");
-            if (!token) throw new Error("Somwthing went wrong while creating JWT token");
+            if (!token) throw new Error("Something went wrong while creating JWT token");
             res.cookie("token", token);
 
             res.status(200).send("Login Successful");
