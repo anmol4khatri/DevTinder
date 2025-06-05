@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
+const { userAuth } = require("./middlewares/auth");
 
 const app = express();
 
@@ -33,7 +34,6 @@ app.post("/signup", async (req, res) => {
             skills
         });
         await user.save(); //Saving document into the database
-    
         res.status(200).send("User data saved successfully");
 
     } catch (err) {
@@ -53,7 +53,7 @@ app.post("/login", async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, user.password); //Compare user entered password with existing hashed password
         if(isPasswordValid) {
             //Creating JWT Token
-            const token = jwt.sign({_id: user._id}, "DevTinder@key");
+            const token = jwt.sign({_id: user._id}, "DevTinder@key", {expiresIn: "7d"});
             if (!token) throw new Error("Something went wrong while creating JWT token");
             res.cookie("token", token);
 
@@ -69,17 +69,10 @@ app.post("/login", async (req, res) => {
 });
 
 //User Profile
-app.get("/profile", (req,res) => {
-    //check and verify the JWT token from the browser cookies
-    const token = req.cookies.token;
-
+app.get("/profile", userAuth, (req,res) => {
     try{
-        //redirect to login page if cookies does not exists
-        if(!token) return res.redirect("/login");
-
-        //allow user to to interect with the server only if the JWT verification gets successful
-        const decoded = jwt.verify(token, "DevTinder@key");
-        res.status(200).send(decoded);
+        const user = req.user;//comes form userAuth middleware
+        res.status(200).send(user);
     } catch(err){
         res.status(500).send("Error: " + err.message);
     }
