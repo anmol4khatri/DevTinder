@@ -3,6 +3,7 @@
         "wix.vscode-import-cost",
         "orta.vscode-jest",
         "bengreenier.vscode-node-readme",
-        "jasonnutter.search-node-modules"
+        "jasonnutter.search-node-modules",
+        "mightbesimon.emoji-icons"
     ]
 }

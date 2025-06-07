@@ -1,6 +1,7 @@
 const express = require("express");
+const validator = require("validator");
+const bcrypt = require("bcrypt");
 const { userAuth } = require("../middlewares/auth");
-const User = require("../models/user");
 
 const profileRouter = express.Router();
 
@@ -37,16 +38,43 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
 
 //Password Change
 profileRouter.patch("/profile/changePassword", userAuth, async (req, res) => {
-    // TODO: 
-    // input(res.body) ==> currentPassword, New Password, Coinform Password
-    // none of the field shoud be empty
-    // new password should exactly match coinform password
-    // password data validation
-    // bcrypt comapre ==> currentPAssword & newPassword
-    // throw error if not
-    // if true, hash new passowrd and store it to the DB
-    // generate a new jwt token
-    // overwrite the cookie to store new token
+    
+    const { currentPassword, newPassword, confirmNewPassword } = req.body;
+    const user = req.user; // comes from userAuth middleware
+
+    try {
+        // Checks if any of those three field is left empty
+        if(!currentPassword || !newPassword || !confirmNewPassword){
+            return res.status(400).json({error: "All fields are required"});
+        };
+        // Checks if "newPassword" exactly matches with "confirmPassword"
+        if(newPassword !== confirmNewPassword){
+            return res.status(400).json({error: "Confirm Password should be same as New Password"});
+        };
+        // Validates if the "newPassword" is strong enough
+        if(!validator.isStrongPassword(newPassword)){
+            return res.status(400).json({error: "Choose a strong password"});
+        };
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password);;
+        if(!isMatch){
+            return res.status(400).json({error: "Current Password Entered Is Incorrect"});
+        }
+
+        //Hashing & Updating New Password
+        user.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
+
+        //Generating new JWT Token and overwriting the cookies with new Token
+        const newToken = user.getJWT();  //user schema method function
+        res.cookie("token", newToken);
+
+        res.status(200).json({message: "Password updated successfully"});
+
+
+    } catch (err) {
+        res.status(500).json({error: "Internal Server Error: " + err.message});
+    }
 });
 
 module.exports = profileRouter;
