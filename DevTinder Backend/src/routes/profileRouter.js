@@ -17,12 +17,15 @@ profileRouter.get("/profile/view", userAuth, (req,res) => {
 //Update the profile details
 profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
     try {
-        const user = req.user;//comes form userAuth middleware
-        const updatedUser = await User.findByIdAndUpdate(
-            { _id: req.user._id },
-            { $set: req.body },
-        );
-        if (!updatedUser) throw new Error("User not found");
+        const loggedInUser = req.user; //comes from userAuth middleware
+        const editAllowedFields = ["firstName", "lastName", "emailId", "photoUrl", "about", "skills"];
+
+        Object.keys(req.body).forEach((key) => {
+            if(editAllowedFields.includes(key)) {
+                loggedInUser[key] = req.body[key];
+            }
+        });
+        await loggedInUser.save();
         res.status(200).send("User Updated Successfully");
     } catch (err) {
         res.status(500).send("Error: " + err.message);
