@@ -1,9 +1,12 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Body from "./components/Body";
 import Login from "./components/Login";
+import store from "./utils/store";
+import { Provider } from "react-redux"
 
 const App = () => {
   return(
+	<Provider store={store}>
     <BrowserRouter>
     	<Routes>
         	<Route path="/" element={<Body/>}>
@@ -11,6 +14,7 @@ const App = () => {
         	</Route>
       	</Routes>
     </BrowserRouter>
+	</Provider>
   );
 };
 
