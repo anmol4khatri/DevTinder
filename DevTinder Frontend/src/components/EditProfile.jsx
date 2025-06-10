@@ -1,5 +1,9 @@
 import { useState } from "react";
 import UserCard from "./UserCard";
+import {useDispatch} from "react-redux";
+import {addUser} from "../utils/userSlice";
+import axios from "axios";
+import {BASE_URL} from "../utils/constants";
 
 const EditProfile = ({ user }) => {
     const [firstName, setFirstName] = useState(user?.firstName);
@@ -8,6 +12,28 @@ const EditProfile = ({ user }) => {
     const [gender, setGender] = useState(user?.gender);
     const [photoUrl, setPhotoUrl] = useState(user?.photoUrl);
     const [about, setAbout] = useState(user?.about)
+
+    const [showToast, setShowToast] = useState(false);
+    const [error, setError] = useState("");
+
+    const dispatch = useDispatch();
+
+    const saveProfile = async () => {
+        setError("") //clear errors, if any
+        try {
+            const res =  await axios.patch(BASE_URL + "/profile/edit", {
+                firstName, lastName, age, gender, photoUrl, about
+            }, {withCredentials: true});
+            dispatch(addUser(res?.data?.data));
+
+            setShowToast(true);
+            setTimeout(()=>{
+                setShowToast(false);
+            },2000)
+        } catch (err) {
+            setError(err?.response?.data);
+        }
+    };
 
     return (
         <div className="flex mt-10 justify-center gap-12 items-end">
@@ -38,14 +64,20 @@ const EditProfile = ({ user }) => {
                     <label className="label">About</label>
                     <input className="input" placeholder="About"
                         value={about} onChange={(e) => setAbout(e.target.value)} />
-
-                    <button className="btn btn-primary mt-4">Login</button>
+                    
+                    <p className="text-red-500">{error}</p>
+                    <button className="btn btn-primary mt-4" onClick={saveProfile}>Save Profile</button>
                 </fieldset>
             </div>
             <div className="w-xs">
                 <h3 className="font-semibold">Preview</h3>
                 <UserCard user={{firstName, lastName, age, gender, photoUrl, about}}/>
             </div>
+            {showToast && <div className="toast toast-top toast-end mt-28 mr-6">
+                <div className="alert alert-success">
+                    <span>Profile updated successfully.</span>
+                </div>
+            </div>}
         </div>
     );
 };
