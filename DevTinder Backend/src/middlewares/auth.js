@@ -5,7 +5,7 @@ const userAuth = async (req, res, next) => {
     const token = req.cookies.token;
 
     //if token does not exists, redirect user to login page upfront
-    if(!token) throw new Error("Invalid Token");
+    if(!token) return res.status(401).send("Unauthorized Access");
 
     try {
         //if token exists, verify the token
