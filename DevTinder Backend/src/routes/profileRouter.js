@@ -19,7 +19,7 @@ profileRouter.get("/profile/view", userAuth, (req, res) => {
 profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
     try {
         const loggedInUser = req.user; //comes from userAuth middleware
-        const editAllowedFields = ["firstName", "lastName", "emailId", "photoUrl", "about", "skills"];
+        const editAllowedFields = ["firstName", "lastName", "emailId", "photoUrl", "about", "skills", "age", "gender"];
 
         Object.keys(req.body).forEach((key) => {
             if (editAllowedFields.includes(key)) {
