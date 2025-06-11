@@ -44,6 +44,7 @@ const Header = () => {
                             </Link>
                         </li>
                         <li><Link to={"/Connections"}>Connections</Link></li>
+                        <li><Link to={"/Requests"}>Requests</Link></li>
                         <li><a onClick={handleLogout}>Logout</a></li>
                     </ul>
                 </div>}
