@@ -1,40 +1,45 @@
-import axios from "axios"
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { addUser } from "../utils/userSlice";
-import { useNavigate } from 'react-router-dom';
-import { BASE_URL } from "../utils/constants";
-import { Link } from "react-router"
+import axios from "axios";
+import {BASE_URL} from "../utils/constants";
+import {Link} from "react-router"
+import { useNavigate } from "react-router";
 
-const Login = () => {
-
-    const selector = useSelector((store) => store.user);
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-
-    const [emailId, setEmailId] = useState("")
+const SignUp = () => {
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [emailId, setEmailId] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleLogin = async () => {
-        try {
-            const res = await axios.post(BASE_URL + "/login",
-                {emailId, password},
-                {withCredentials: true}
-            );
-            dispatch(addUser(res.data.user));
-            navigate("/");
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
 
+    const signUp = async () => {
+        setError("") //clear errors, if any
+        try {
+            const res =  await axios.post(BASE_URL + "/signup", {
+                firstName, lastName, emailId, password
+            }, {withCredentials: true});
+            navigate("/login")
         } catch (err) {
-            res.status(500).json({error: "Error: " + err.message});
+            setError(err?.response?.data);
         }
     };
 
     return (
-        <div className="hero bg-base-200 min-h-screen">
-            <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
-                <div className="card-body">
-                    <fieldset className="fieldset">
-                        <label className="label">Email</label>
+        <div className="flex mt-10 justify-center gap-12 items-end">
+            <div>
+                <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-8">
+                    <legend className="fieldset-legend">Sign Up</legend>
+
+                    <label className="label">First Name</label>
+                    <input className="input" placeholder="First Name"
+                        value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+
+                    <label className="label">Last Name</label>
+                    <input className="input" placeholder="Last Name"
+                        value={lastName} onChange={(e) => setLastName(e.target.value)} />
+
+                    <label className="label">Email</label>
                         <label className="input validator">
                             <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                 <g
@@ -52,7 +57,8 @@ const Login = () => {
                             value={emailId} onChange={(e) => setEmailId(e.target.value)}/>
                         </label>
                         <div className="validator-hint hidden">Enter valid email address</div>
-                        <label className="label">Password</label>
+
+                    <label className="label">Password</label>
                         <label className="input validator">
                             <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                 <g
@@ -79,17 +85,15 @@ const Login = () => {
                                 onChange={(e) => setPassword(e.target.value)}
                             />
                         </label>
-                        <p className="validator-hint hidden">
-                            Must be more than 8 characters, including
-                            <br />At least one number <br />At least one lowercase letter <br />At least one uppercase letter
-                        </p>
-                        <button className="btn btn-primary mt-4" onClick={handleLogin}>Login</button>
-                    </fieldset>
-                    <div><Link to="/Signup" className="link link-hover font-semibold">New here? Create a account</Link></div>
-                </div>
+                    
+                    <p className="text-red-500">{error}</p>
+                    <button className="btn btn-primary mt-4" onClick={signUp}>Create Account</button>
+                    <div><Link to="/Login" className="link link-hover font-semibold">Already have an account? Login</Link></div>
+                    
+                </fieldset>
             </div>
         </div>
     );
 };
 
-export default Login;
+export default SignUp;

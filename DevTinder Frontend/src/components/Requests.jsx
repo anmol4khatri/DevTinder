@@ -44,11 +44,12 @@ const Requests = () => {
             {requests.map((request, index) => {
                 const { _id, firstName, lastName, age, gender, about, photoUrl } = request?.fromUserId;
                 return (
-                    <div key={_id} className="flex m-4 p-4 rounded-lg bg-base-300 w-1/2 mx-auto">
+                    <div key={_id} className="flex m-4 p-4 rounded-lg bg-base-300 w-1/2 mx-auto justify-between">
+                        <div className="flex">
                         <div>
                             <img
                                 alt="photo"
-                                className="w-20 h-20 rounded-full"
+                                className="w-20 h-20 rounded-full object-cover"
                                 src={photoUrl}
                             />
                         </div>
@@ -58,6 +59,7 @@ const Requests = () => {
                             </h2>
                             {age && gender && <p>{age + ", " + gender}</p>}
                             <p>{about}</p>
+                        </div>
                         </div>
                         <div className="flex w-56 justify-center items-center ml-20">
                             <button className="btn btn-primary mx-2 p-6"
