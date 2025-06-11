@@ -13,8 +13,7 @@ const Feed = () => {
     const getFeed = async () => {
         try {
             if(feed?.length > 0) return;
-
-            const res = await axios.get(BASE_URL + "/feed", { withCredentials: true });
+            const res = await axios.get(BASE_URL + "/feed" + "?page=1&limit=1", { withCredentials: true });
             dispatch(addFeed(res?.data?.data));
         } catch (err) {
 
@@ -23,7 +22,7 @@ const Feed = () => {
 
     useEffect(() => {
         getFeed();
-    }, [])
+    }, [feed])
 
     if (!feed || feed.length === 0) {
         return <h1 className="font-bold text-3xl text-center mt-6">No new users founds!</h1>;
