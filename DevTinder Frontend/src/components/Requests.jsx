@@ -11,8 +11,8 @@ const Requests = () => {
 
     const reviewRequest = async (status, requestId) => {
         try {
-            const res = await axios.post(BASE_URL + "/request/review/" + status + "/"+ requestId, {}, {withCredentials:true});
-            if(res.status === 200){
+            const res = await axios.post(BASE_URL + "/request/review/" + status + "/" + requestId, {}, { withCredentials: true });
+            if (res.status === 200) {
                 dispatch(removeRequest(requestId));
             }
         } catch (err) {
@@ -44,28 +44,28 @@ const Requests = () => {
             {requests.map((request, index) => {
                 const { _id, firstName, lastName, age, gender, about, photoUrl } = request?.fromUserId;
                 return (
-                    <div key={_id} className="flex m-4 p-4 rounded-lg bg-base-300 w-1/2 mx-auto justify-between">
+                    <div key={_id} className="flex flex-col md:flex-row m-4 p-4 rounded-lg bg-base-300 w-full md:w-1/2 mx-auto justify-between">
                         <div className="flex">
-                        <div>
-                            <img
-                                alt="photo"
-                                className="w-20 h-20 rounded-full object-cover"
-                                src={photoUrl}
-                            />
+                            <div>
+                                <img
+                                    alt="photo"
+                                    className="w-20 h-20 rounded-full object-cover"
+                                    src={photoUrl}
+                                />
+                            </div>
+                            <div className="text-left mx-4">
+                                <h2 className="font-bold text-xl">
+                                    {firstName + " " + lastName}
+                                </h2>
+                                {age && gender && <p>{age + ", " + gender}</p>}
+                                <p>{about}</p>
+                            </div>
                         </div>
-                        <div className="text-left mx-4">
-                            <h2 className="font-bold text-xl">
-                                {firstName + " " + lastName}
-                            </h2>
-                            {age && gender && <p>{age + ", " + gender}</p>}
-                            <p>{about}</p>
-                        </div>
-                        </div>
-                        <div className="flex w-56 justify-center items-center ml-20">
+                        <div className="flex md:flex-row w-full md:w-56 justify-center items-center mt-4 md:mt-0 md:ml-20">
                             <button className="btn btn-primary mx-2 p-6"
-                            onClick={() => reviewRequest("rejected", request._id)}>Reject</button>
+                                onClick={() => reviewRequest("rejected", request._id)}>Reject</button>
                             <button className="btn btn-secondary mx-2 p-6"
-                            onClick={() => reviewRequest("accepted", request._id)}>Accept</button>
+                                onClick={() => reviewRequest("accepted", request._id)}>Accept</button>
                         </div>
                     </div>
                 );
